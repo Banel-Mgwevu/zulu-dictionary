@@ -5,6 +5,7 @@ import 'package:flutter_azure_tts/flutter_azure_tts.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:just_audio/just_audio.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 class DictionaryEntry {
   final String word;
@@ -33,7 +34,12 @@ class DictionaryService {
   }
 }
 
-void main() {
+
+Future main() async{
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+ // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  await Future.delayed(const Duration(seconds: 3));
+  FlutterNativeSplash.remove();
   runApp(MyApp());
 }
 
@@ -143,7 +149,7 @@ class _DictionaryAppState extends State<DictionaryApp> {
                         trailing: IconButton(
                           icon: Icon(Icons.volume_up),
                           onPressed: () {
-                            _executeAzureTTS(entry.definition);
+                            _executeAzureTTS(entry.isizulu);
                           },
                         ),
                         onTap: () {
@@ -175,32 +181,41 @@ class DefinitionScreen extends StatelessWidget {
         title: Text(entry.word),
         backgroundColor: Theme.of(context).primaryColor,
       ),
-      body: Container(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'isiZulu: ${entry.isizulu}',
-              style: TextStyle(fontSize: 18),
-            ),
-            Text(
-              'Definition: ${entry.definition}',
-              style: TextStyle(fontSize: 18),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                primary: Theme.of(context).accentColor,
-              ),
-              child: Text('Back to Dictionary'),
-            ),
-          ],
+      body:Container(
+  padding: EdgeInsets.all(16.0),
+  child: Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center, // Center text vertically
+      children: [
+        Text(
+          'isiZulu: ${entry.isizulu}',
+          style: TextStyle(fontSize: 18, fontFamily: 'YourDesiredFont'), // Change the font size and family
+          textAlign: TextAlign.center, // Center text horizontally
         ),
-      ),
+        SizedBox(height: 10), // Add some space between the text and the definition
+        Text(
+          'Definition: ${entry.definition}',
+          style: TextStyle(fontSize: 20, fontFamily: 'YourDesiredFont'), // Change the font size and family
+          textAlign: TextAlign.center, // Center text horizontally
+        ),
+        SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: () {
+            // Navigator.pop(context);
+            _executeAzureTTS(entry.definition);
+          },
+          style: ElevatedButton.styleFrom(
+            primary: Theme.of(context).accentColor,
+          ),
+          child: Text('Read The Definition In Isizulu', style: TextStyle(fontFamily: 'YourDesiredFont')), // Change the font family
+        ),
+      ],
+    ),
+  ),
+),
+
+
+    
     );
   }
 }
@@ -216,7 +231,7 @@ Future<void> _executeAzureTTS(String content) async {
   TtsParams params = TtsParams(
     voice: voice,
     audioFormat: AudioOutputFormat.audio16khz32kBitrateMonoMp3,
-    rate: 1.5,
+    rate: 1.2,
     text: content,
   );
 
